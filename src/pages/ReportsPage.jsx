@@ -476,18 +476,18 @@ export default function ReportsPage() {
       </div>
 
       {/* ── Summary Cards Strip for Current Report ────────────────────────── */}
-      <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', marginBottom: 'var(--space-4)' }}>
+      <div className="dashboard-stats-grid" style={{ marginBottom: 'var(--space-4)' }}>
         {activeReport === 'MONTH_WISE_COLLECTION' && (
           <>
-            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)', flex: 1, minWidth: 160 }}>
+            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)' }}>
               <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>Yearly Real Cash Collection</div>
               <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#10b981' }}>{formatCurrency(summaryMetrics.totalCash || 0)}</div>
             </div>
-            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)', flex: 1, minWidth: 160 }}>
+            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)' }}>
               <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>Yearly Fee Coverage Allocated</div>
               <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#7c6fcd' }}>{formatCurrency(summaryMetrics.totalCoverage || 0)}</div>
             </div>
-            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)', flex: 1, minWidth: 160 }}>
+            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)' }}>
               <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>Total Outstanding Dues</div>
               <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f59e0b' }}>{formatCurrency(summaryMetrics.totalOutstanding || 0)}</div>
             </div>
@@ -496,11 +496,11 @@ export default function ReportsPage() {
 
         {activeReport === 'OUTSTANDING_DUES' && (
           <>
-            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)', flex: 1, minWidth: 160 }}>
+            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)' }}>
               <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>Total Defaulter Students</div>
               <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f59e0b' }}>{summaryMetrics.defaultersCount || 0}</div>
             </div>
-            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)', flex: 1, minWidth: 160 }}>
+            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)' }}>
               <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>Total Overdue Amount</div>
               <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ef4444' }}>{formatCurrency(summaryMetrics.totalOutstanding || 0)}</div>
             </div>
@@ -509,7 +509,7 @@ export default function ReportsPage() {
 
         {activeReport === 'LOCKER_DEPOSITS' && (
           <>
-            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)', flex: 1, minWidth: 160 }}>
+            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)' }}>
               <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>Active Refundable Deposits Held</div>
               <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ec4899' }}>{formatCurrency(summaryMetrics.activeHeld || 0)}</div>
               <div style={{ fontSize: '0.68rem', color: 'var(--color-text-subtle)' }}>Security liability (Not operating income)</div>
@@ -519,7 +519,7 @@ export default function ReportsPage() {
       </div>
 
       {/* ── Main Report Table ─────────────────────────────────────────────── */}
-      <div className="card" style={{ padding: 'var(--space-4)' }}>
+      <div className="card" style={{ padding: 'var(--space-4)', minWidth: 0 }}>
         {loading ? (
           <SkeletonTable rows={8} cols={6} />
         ) : filteredData.length === 0 ? (
@@ -529,7 +529,7 @@ export default function ReportsPage() {
             description="No data matches the selected report criteria and filters."
           />
         ) : (
-          <div className="table-responsive">
+          <div className="table-wrapper table-responsive">
             {/* 1. Month-wise Collections Table */}
             {activeReport === 'MONTH_WISE_COLLECTION' && (
               <table className="table" style={{ fontSize: '0.8rem' }}>

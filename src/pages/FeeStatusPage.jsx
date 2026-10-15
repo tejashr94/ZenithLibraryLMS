@@ -132,24 +132,26 @@ export default function FeeStatusPage({ onNavigate = () => {}, initialParams = {
             Month-wise fee collection tracking, pending defaulters, and active student continuation
           </p>
         </div>
-        <button className="btn btn-ghost btn-sm" onClick={fetchMonthlyStatus}>
-          <RefreshCw size={14} /> Refresh
-        </button>
+        <div className="page-header-actions">
+          <button className="btn btn-ghost btn-sm" onClick={fetchMonthlyStatus}>
+            <RefreshCw size={14} /> Refresh
+          </button>
+        </div>
       </div>
 
       {/* ── Month & Year Picker ──────────────────────────────────────── */}
-      <div className="card" style={{ marginBottom: 'var(--space-5)', padding: 'var(--space-4)' }}>
+      <div className="card" style={{ marginBottom: 'var(--space-4)', padding: 'var(--space-3) var(--space-4)' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-            <CalendarCheck size={20} style={{ color: 'var(--color-primary-light)' }} />
-            <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>Select Target Fee Month:</span>
+            <CalendarCheck size={18} style={{ color: 'var(--color-primary-light)', flexShrink: 0 }} />
+            <span style={{ fontWeight: 600, color: 'var(--color-text-primary)', fontSize: '0.88rem' }}>Select Target Fee Month:</span>
           </div>
 
-          <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', width: 'auto' }}>
             {/* Month select */}
             <select
               className="form-input"
-              style={{ width: 150 }}
+              style={{ width: 'auto', minWidth: 120, flex: 1 }}
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
             >
@@ -161,7 +163,7 @@ export default function FeeStatusPage({ onNavigate = () => {}, initialParams = {
             {/* Year select (2026 - 2050) */}
             <select
               className="form-input"
-              style={{ width: 110 }}
+              style={{ width: 'auto', minWidth: 80 }}
               value={selectedYear}
               onChange={(e) => setSelectedYear(parseInt(e.target.value))}
             >
@@ -174,7 +176,7 @@ export default function FeeStatusPage({ onNavigate = () => {}, initialParams = {
       </div>
 
       {/* ── Summary Stats for Target Month ───────────────────────────── */}
-      <div className="dashboard-stats" style={{ marginBottom: 'var(--space-5)' }}>
+      <div className="dashboard-stats-grid" style={{ marginBottom: 'var(--space-4)' }}>
         <div className="stat-card">
           <div className="stat-card-header">
             <div className="stat-icon" style={{ background: 'rgba(124, 111, 205, 0.15)', color: 'var(--color-primary-light)' }}>
@@ -223,43 +225,63 @@ export default function FeeStatusPage({ onNavigate = () => {}, initialParams = {
       </div>
 
       {/* ── Search & Filter Tabs ──────────────────────────────────────── */}
-      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        <div style={{ padding: 'var(--space-4) var(--space-5)', borderBottom: '1px solid var(--color-border)', display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)', justifyContent: 'space-between', alignItems: 'center' }}>
-          {/* Status Tabs */}
-          <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+      <div className="card" style={{ padding: 0, overflow: 'hidden', minWidth: 0, maxWidth: '100%' }}>
+        <div style={{
+          padding: 'var(--space-3) var(--space-4)',
+          borderBottom: '1px solid var(--color-border)',
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 'var(--space-3)',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          {/* Status Tabs - horizontally scrollable without breaking mobile layout */}
+          <div style={{
+            display: 'flex',
+            gap: 'var(--space-2)',
+            overflowX: 'auto',
+            maxWidth: '100%',
+            WebkitOverflowScrolling: 'touch',
+            paddingBottom: 2,
+            boxSizing: 'border-box'
+          }}>
             <button
               className={`btn btn-sm ${statusFilter === 'ALL' ? 'btn-primary' : 'btn-secondary'}`}
               onClick={() => setStatusFilter('ALL')}
+              style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
             >
               All Students ({studentList.length})
             </button>
             <button
               className={`btn btn-sm ${statusFilter === 'PAID' ? 'btn-primary' : 'btn-secondary'}`}
               onClick={() => setStatusFilter('PAID')}
+              style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
             >
               Paid ({summary.paidCount || 0})
             </button>
             <button
               className={`btn btn-sm ${statusFilter === 'PARTIALLY_PAID' ? 'btn-primary' : 'btn-secondary'}`}
               onClick={() => setStatusFilter('PARTIALLY_PAID')}
+              style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
             >
               Partial ({summary.partialCount || 0})
             </button>
             <button
               className={`btn btn-sm ${statusFilter === 'PENDING' ? 'btn-primary' : 'btn-secondary'}`}
               onClick={() => setStatusFilter('PENDING')}
+              style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
             >
               Pending ({summary.pendingCount || 0})
             </button>
           </div>
 
-          {/* Quick Search */}
-          <div style={{ position: 'relative', width: 240 }}>
+          {/* Quick Search - flex responsive */}
+          <div style={{ position: 'relative', flex: '1 1 180px', minWidth: 140, maxWidth: '100%' }}>
             <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} />
             <input
               type="text"
               className="form-input"
-              style={{ paddingLeft: 32, fontSize: 'var(--text-xs)' }}
+              style={{ paddingLeft: 32, fontSize: 'var(--text-xs)', width: '100%' }}
               placeholder="Filter by name / reg…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

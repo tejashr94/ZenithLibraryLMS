@@ -418,15 +418,15 @@ export default function MonthlyFeeAnalyticsPage({ onNavigate = () => {} }) {
               Month-by-month cash receipts, allocated fee coverage, registration fees & refundable locker security deposits
             </p>
           </div>
-          <div style={{ display: 'flex', gap: 12, fontSize: '0.75rem' }}>
-            <span style={{ color: '#10b981', fontWeight: 600 }}>● Cash Collection</span>
-            <span style={{ color: '#7c6fcd', fontWeight: 600 }}>● Fee Coverage</span>
-            <span style={{ color: '#a855f7', fontWeight: 600 }}>● Registration Fees</span>
-            <span style={{ color: '#ec4899', fontWeight: 600 }}>● Locker Deposits</span>
+          <div style={{ display: 'flex', gap: '6px 12px', fontSize: '0.72rem', flexWrap: 'wrap' }}>
+            <span style={{ color: '#10b981', fontWeight: 600, whiteSpace: 'nowrap' }}>● Cash Collection</span>
+            <span style={{ color: '#7c6fcd', fontWeight: 600, whiteSpace: 'nowrap' }}>● Fee Coverage</span>
+            <span style={{ color: '#a855f7', fontWeight: 600, whiteSpace: 'nowrap' }}>● Registration Fees</span>
+            <span style={{ color: '#ec4899', fontWeight: 600, whiteSpace: 'nowrap' }}>● Locker Deposits</span>
           </div>
         </div>
 
-        <div style={{ width: '100%', height: 340 }}>
+        <div style={{ width: '100%', minWidth: 0, height: 320, overflow: 'hidden' }}>
           <ResponsiveContainer width="100%" height="100%">
             {chartType === 'bar' ? (
               <BarChart data={monthByMonth} margin={{ top: 10, right: 15, left: 10, bottom: 0 }}>
@@ -457,7 +457,7 @@ export default function MonthlyFeeAnalyticsPage({ onNavigate = () => {} }) {
       </div>
 
       {/* ── Month-by-Month Detailed Accounting Table ──────────────────────── */}
-      <div className="card" style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
+      <div className="card" style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-6)', minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-3)', flexWrap: 'wrap', gap: 8 }}>
           <div>
             <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
@@ -470,7 +470,7 @@ export default function MonthlyFeeAnalyticsPage({ onNavigate = () => {} }) {
           <span className="badge badge-primary">{yearlyTotals.totalAdmissions || 0} New Admissions in {selectedYear}</span>
         </div>
 
-        <div className="table-responsive">
+        <div className="table-wrapper table-responsive">
           <table className="table" style={{ fontSize: '0.78rem' }}>
             <thead>
               <tr>

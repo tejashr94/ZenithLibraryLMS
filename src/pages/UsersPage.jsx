@@ -479,7 +479,7 @@ export default function UsersPage() {
             Create manager and owner credentials, configure permissions, enforce password resets & inspect audit trails
           </p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+        <div className="page-header-actions">
           <button className="btn btn-ghost btn-sm" onClick={() => setShowAudit(true)}>
             <History size={14} /> Audit Trail
           </button>
@@ -500,8 +500,8 @@ export default function UsersPage() {
           description="Create manager or owner accounts for your library operations."
           action={<button className="btn btn-primary" onClick={() => setShowCreate(true)}><Plus size={16}/>Create Account</button>} />
       ) : (
-        <div className="card" style={{ padding: 0 }}>
-          <div className="table-responsive">
+        <div className="card" style={{ padding: 0, minWidth: 0 }}>
+          <div className="table-wrapper table-responsive">
             <table className="table" aria-label="User accounts" style={{ fontSize: '0.82rem' }}>
               <thead>
                 <tr>

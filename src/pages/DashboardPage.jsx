@@ -710,8 +710,8 @@ export default function DashboardPage({ onNavigate = () => {} }) {
         </div>
 
         {/* ── Recent Transactions Table ────────────────────────────────── */}
-        <div className="card" style={{ padding: 'var(--space-4)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-3)' }}>
+        <div className="card" style={{ padding: 'var(--space-4)', minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-3)', flexWrap: 'wrap', gap: 8 }}>
             <div>
               <h3 style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
                 Recent Cash Collections
@@ -730,7 +730,7 @@ export default function DashboardPage({ onNavigate = () => {} }) {
               No payments recorded yet.
             </div>
           ) : (
-            <div className="table-responsive">
+            <div className="table-wrapper table-responsive">
               <table className="table" style={{ fontSize: '0.8rem' }}>
                 <thead>
                   <tr>

@@ -176,6 +176,9 @@ a {
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   box-shadow: var(--shadow-md);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .card-sm { padding: var(--space-4); border-radius: var(--radius-md); }
@@ -373,10 +376,22 @@ a {
 .badge-lime    { background: var(--color-lime-dim);    color: var(--color-lime);    border: 1px solid rgba(168,224,99,0.3); }
 
 /* ── Table ────────────────────────────────────────── */
-.table-wrapper {
+.table-wrapper,
+.table-responsive {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.card > .table-wrapper,
+.card > .table-responsive {
+  border: none;
+  border-radius: 0;
 }
 
 .table {
@@ -601,7 +616,24 @@ a {
   line-height: 1.7;
 }
 
-/* ── Stat Card ────────────────────────────────────── */
+/* ── Stat Cards & Grids ───────────────────────────── */
+.dashboard-stats,
+.dashboard-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-stats,
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
 .stat-card {
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
@@ -611,6 +643,8 @@ a {
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .stat-card::before {
@@ -851,19 +885,22 @@ html, body {
   }
 
   /* Tables always scroll cleanly horizontally without pushing page boundaries */
-  .table-wrapper {
+  .table-wrapper,
+  .table-responsive {
     width: 100% !important;
     max-width: 100% !important;
     overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling: touch !important;
     display: block !important;
     border-radius: var(--radius-md) !important;
-    margin-bottom: var(--space-4) !important;
-    box-shadow: inset -4px 0 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: var(--space-3) !important;
+    box-shadow: inset -6px 0 10px rgba(0, 0, 0, 0.25) !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
   }
 
   .table {
-    min-width: 600px !important; /* Preserves column legibility with horizontal scroll */
+    min-width: 580px !important; /* Preserves column legibility with horizontal scroll */
   }
 
   .table th,
@@ -871,6 +908,35 @@ html, body {
     padding: 8px 10px !important;
     font-size: 0.75rem !important;
     white-space: nowrap;
+  }
+
+  /* Responsive Stat Grids on mobile */
+  .dashboard-stats,
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: var(--space-3) !important;
+  }
+
+  .stat-card {
+    padding: 10px 10px !important;
+  }
+
+  .stat-card .stat-value {
+    font-size: 1.2rem !important;
+  }
+
+  .stat-card .stat-label {
+    font-size: 0.72rem !important;
+  }
+
+  /* Recharts responsiveness */
+  .recharts-responsive-container {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  .recharts-wrapper {
+    max-width: 100% !important;
   }
 
   /* Modals / Drawers */
@@ -915,6 +981,20 @@ html, body {
 
   .card {
     padding: 12px 10px !important;
+  }
+
+  .dashboard-stats,
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .stat-card {
+    padding: 8px 8px !important;
+  }
+
+  .stat-card .stat-value {
+    font-size: 1.05rem !important;
   }
 
   .btn-xl {
