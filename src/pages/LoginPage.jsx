@@ -10,7 +10,7 @@ const MAX_ATTEMPTS = config.maxLoginAttemptsBeforeLockoutHint;
 const LOCKOUT_SECONDS = 30;
 
 export default function LoginPage() {
-  const { login, isLoading, authError, loginAttempts, clearError } = useAuth();
+  const { login, isLoading, isLoggingIn, authError, loginAttempts, clearError } = useAuth();
   const toast = useToast();
 
   const [username, setUsername] = useState('');
@@ -91,7 +91,7 @@ export default function LoginPage() {
   }
 
   const isLocked = lockoutTimer > 0;
-  const submitting = isLoading && !configError;
+  const submitting = (isLoggingIn || isLoading) && !configError;
 
   return (
     <div className="login-page" role="main">

@@ -8,21 +8,29 @@ import React, { createContext, useContext, useReducer, useEffect, useCallback } 
 import { authApi } from '../services/api';
 import { saveSession, loadSession, clearSession } from '../utils/session';
 
-// ── State ────────────────────────────────────────────────────────────────────
-
-const initialState = {
-  user: null,          // Server-authenticated user object
-  token: null,         // Server-issued session token
-  isAuthenticated: false,
-  isLoading: true,     // True during initial session validation
-  authError: null,     // Last authentication error message
-  loginAttempts: 0,    // Track failed attempts for UX lockout hint
-};
+// ── State Initialization ─────────────────────────────────────────────────────
+// Synchronously read existing session so the first render is instantaneous
+// with 0ms splash delay!
+function getInitialAuthState() {
+  const saved = typeof window !== 'undefined' ? loadSession() : null;
+  return {
+    user: saved?.user || null,
+    token: saved?.token || null,
+    isAuthenticated: Boolean(saved?.token && saved?.user),
+    isLoading: false,    // Instant mount — never block the first render
+    isLoggingIn: false,  // True only when submitting credentials
+    authError: null,
+    loginAttempts: 0,
+  };
+}
 
 // ── Reducer ──────────────────────────────────────────────────────────────────
 
 function authReducer(state, action) {
   switch (action.type) {
+    case 'LOGIN_START':
+      return { ...state, isLoggingIn: true, authError: null };
+
     case 'AUTH_INIT_START':
       return { ...state, isLoading: true, authError: null };
 
@@ -33,8 +41,15 @@ function authReducer(state, action) {
         token: action.payload.token,
         isAuthenticated: true,
         isLoading: false,
+        isLoggingIn: false,
         authError: null,
         loginAttempts: 0,
+      };
+
+    case 'AUTH_USER_UPDATE':
+      return {
+        ...state,
+        user: action.payload.user,
       };
 
     case 'AUTH_FAILURE':
@@ -44,18 +59,23 @@ function authReducer(state, action) {
         token: null,
         isAuthenticated: false,
         isLoading: false,
+        isLoggingIn: false,
         authError: action.payload.message,
         loginAttempts: state.loginAttempts + 1,
       };
 
     case 'AUTH_LOGOUT':
       return {
-        ...initialState,
+        ...getInitialAuthState(),
+        user: null,
+        token: null,
+        isAuthenticated: false,
         isLoading: false,
+        isLoggingIn: false,
       };
 
     case 'AUTH_INIT_DONE_NO_SESSION':
-      return { ...state, isLoading: false };
+      return { ...state, isLoading: false, isLoggingIn: false };
 
     case 'CLEAR_ERROR':
       return { ...state, authError: null };
@@ -70,40 +90,54 @@ function authReducer(state, action) {
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [state, dispatch] = useReducer(authReducer, initialState);
+  const [state, dispatch] = useReducer(authReducer, undefined, getInitialAuthState);
 
-  // ── Restore session on mount ─────────────────────────────────────────────
+  // ── Silent background session verification ───────────────────────────────
+  // If the user already has a valid session token, verify it in the background
+  // without blocking the UI. If the server invalidates it, then log out.
   useEffect(() => {
-    async function restoreSession() {
-      dispatch({ type: 'AUTH_INIT_START' });
+    let isMounted = true;
+    const savedSession = loadSession();
 
-      const savedSession = loadSession();
-      if (!savedSession?.token) {
-        dispatch({ type: 'AUTH_INIT_DONE_NO_SESSION' });
-        return;
-      }
-
-      // Validate the stored token with the server.
-      // If the server rejects it (expired, revoked, tampered), clear local state.
-      try {
-        const result = await authApi.validateSession(savedSession.token);
-        dispatch({
-          type: 'AUTH_SUCCESS',
-          payload: { user: result.user, token: savedSession.token },
-        });
-      } catch {
-        // Token invalid or server unreachable — clear local session
-        clearSession();
-        dispatch({ type: 'AUTH_INIT_DONE_NO_SESSION' });
-      }
+    if (!savedSession?.token) {
+      return;
     }
 
-    restoreSession();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+
+    authApi.validateSession(savedSession.token, controller.signal)
+      .then((result) => {
+        clearTimeout(timeoutId);
+        if (isMounted && result?.user) {
+          dispatch({
+            type: 'AUTH_USER_UPDATE',
+            payload: { user: result.user },
+          });
+        }
+      })
+      .catch((err) => {
+        clearTimeout(timeoutId);
+        // Only log out if explicitly rejected by server (invalid token / disabled account)
+        if (err.code === 'INVALID_SESSION' || err.code === 'ACCOUNT_DISABLED') {
+          clearSession();
+          if (isMounted) {
+            dispatch({ type: 'AUTH_LOGOUT' });
+          }
+        }
+        // If it was just a network timeout or temporary blip, retain session UX
+      });
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   // ── Login ────────────────────────────────────────────────────────────────
   const login = useCallback(async (username, password) => {
-    dispatch({ type: 'AUTH_INIT_START' });
+    dispatch({ type: 'LOGIN_START' });
 
     try {
       const result = await authApi.login(username, password);

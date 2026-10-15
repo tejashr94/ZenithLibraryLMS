@@ -11,7 +11,7 @@ class ApiError extends Error {
   }
 }
 
-async function appsScriptRequest(action, payload = {}, sessionToken = null) {
+async function appsScriptRequest(action, payload = {}, sessionToken = null, customSignal = null) {
   const url = config.appsScriptUrl;
   
   // If backend URL is not set or set to mock, use the local mock simulator
@@ -29,19 +29,39 @@ async function appsScriptRequest(action, payload = {}, sessionToken = null) {
     ...(sessionToken ? { sessionToken } : {}),
   };
 
+  const controller = new AbortController();
+  const timeoutMs = 25000;
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
   let response;
   try {
+    // If a custom signal is provided, combine it or listen to both
+    const activeSignal = customSignal || controller.signal;
+    if (customSignal) {
+      customSignal.addEventListener('abort', () => controller.abort(), { once: true });
+    }
+
     response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(body),
+      signal: activeSignal,
     });
   } catch (networkError) {
+    clearTimeout(timeoutId);
+    if (networkError.name === 'AbortError') {
+      throw new ApiError(
+        'Server took too long to respond. The Google Sheets backend is waking up or connection timed out.',
+        'TIMEOUT_ERROR'
+      );
+    }
     throw new ApiError(
       'Unable to reach backend. Check your internet connection and the Apps Script URL.',
       'NETWORK_ERROR',
       networkError.message
     );
+  } finally {
+    clearTimeout(timeoutId);
   }
 
   if (!response.ok) {
@@ -77,8 +97,8 @@ async function appsScriptRequest(action, payload = {}, sessionToken = null) {
 export const authApi = {
   login: (username, password) =>
     appsScriptRequest('AUTH_LOGIN', { username, password }),
-  validateSession: (sessionToken) =>
-    appsScriptRequest('AUTH_VALIDATE_SESSION', {}, sessionToken),
+  validateSession: (sessionToken, signal = null) =>
+    appsScriptRequest('AUTH_VALIDATE_SESSION', {}, sessionToken, signal),
   logout: (sessionToken) =>
     appsScriptRequest('AUTH_LOGOUT', {}, sessionToken),
   changePassword: (sessionToken, targetUserId, newPassword, currentPassword) =>
