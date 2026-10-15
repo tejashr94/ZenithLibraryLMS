@@ -194,9 +194,17 @@ const SESSION_TTL_DEFAULT_MS = 8 * 60 * 60 * 1000; // 8 hours
 
 // ── Script Properties Helpers ──────────────────────────────────────────────
 
+let _cachedScriptProps = null;
+
 function getScriptProp(key) {
-  const props = PropertiesService.getScriptProperties();
-  const value = props.getProperty(key);
+  if (!_cachedScriptProps) {
+    try {
+      _cachedScriptProps = PropertiesService.getScriptProperties().getProperties() || {};
+    } catch (e) {
+      _cachedScriptProps = {};
+    }
+  }
+  const value = _cachedScriptProps[key];
   if (!value) {
     if (key === 'PASSWORD_SALT') return 'zenith_salt_9876543210_abcdef1234567890_secure';
     if (key === 'SESSION_SECRET') return 'zenith_session_secret_1234567890_abcdef_secure';
@@ -214,8 +222,14 @@ function getScriptProp(key) {
 }
 
 function getOptionalProp(key, defaultValue) {
-  const props = PropertiesService.getScriptProperties();
-  return props.getProperty(key) || defaultValue;
+  if (!_cachedScriptProps) {
+    try {
+      _cachedScriptProps = PropertiesService.getScriptProperties().getProperties() || {};
+    } catch (e) {
+      _cachedScriptProps = {};
+    }
+  }
+  return _cachedScriptProps[key] || defaultValue;
 }
 
 // ── Password Hashing ───────────────────────────────────────────────────────
