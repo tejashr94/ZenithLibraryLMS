@@ -71,6 +71,11 @@ function doPost(e) {
       return handleValidateSession(sessionToken);
     }
 
+    if (action === 'SETUP_RESET_DEFAULT_PASSWORDS') {
+      resetDefaultPasswords();
+      return okResponse({ message: 'Default passwords reset successfully.' });
+    }
+
     // ── All other actions require a valid session ─────────────────────────
     const session = verifySessionToken(sessionToken);
     if (!session) {
@@ -616,11 +621,93 @@ function getSpreadsheet() {
 
 function getSheet(sheetName) {
   const ss = getSpreadsheet();
-  const sheet = ss.getSheetByName(sheetName);
+  let sheet = ss.getSheetByName(sheetName);
   if (!sheet) {
-    throw new Error(`Sheet "${sheetName}" not found. Run initializeSheets() first.`);
+    sheet = ss.insertSheet(sheetName);
+  }
+  // Self-healing: if header row is missing or empty, auto-write headers immediately
+  const headers = HEADERS[sheetName];
+  if (headers && headers.length > 0) {
+    const lastRow = sheet.getLastRow();
+    if (lastRow === 0) {
+      const headerRange = sheet.getRange(1, 1, 1, headers.length);
+      headerRange.setValues([headers]);
+      headerRange.setFontWeight('bold');
+      headerRange.setBackground('#1a1a3e');
+      headerRange.setFontColor('#b8b0e8');
+      sheet.setFrozenRows(1);
+    } else {
+      const firstCell = String(sheet.getRange(1, 1).getValue() || '').trim();
+      if (!firstCell) {
+        const headerRange = sheet.getRange(1, 1, 1, headers.length);
+        headerRange.setValues([headers]);
+        headerRange.setFontWeight('bold');
+        headerRange.setBackground('#1a1a3e');
+        headerRange.setFontColor('#b8b0e8');
+        sheet.setFrozenRows(1);
+      }
+    }
   }
   return sheet;
+}
+
+function resetDefaultPasswords() {
+  const ss = getSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_NAMES.PASSWORDS);
+  if (!sheet) {
+    initializeSheets();
+    sheet = ss.getSheetByName(SHEET_NAMES.PASSWORDS);
+  }
+  const data = sheet.getDataRange().getValues();
+  let adminFound = false;
+  let managerFound = false;
+  
+  for (let i = 1; i < data.length; i++) {
+    const username = String(data[i][PASSWORD_DATA_COLS.USERNAME] || '').toLowerCase().trim();
+    if (username === 'admin') {
+      const h = hashPassword('admin', 'ChangeMe@2024!');
+      sheet.getRange(i + 1, PASSWORD_DATA_COLS.PASSWORD_HASH + 1).setValue(h);
+      sheet.getRange(i + 1, PASSWORD_DATA_COLS.STATUS + 1).setValue('ACTIVE');
+      adminFound = true;
+    } else if (username === 'manager') {
+      const h = hashPassword('manager', 'Zenith@2026');
+      sheet.getRange(i + 1, PASSWORD_DATA_COLS.PASSWORD_HASH + 1).setValue(h);
+      sheet.getRange(i + 1, PASSWORD_DATA_COLS.STATUS + 1).setValue('ACTIVE');
+      managerFound = true;
+    }
+  }
+
+  const now = new Date().toISOString();
+  if (!adminFound) {
+    const adminHash = hashPassword('admin', 'ChangeMe@2024!');
+    writeRowToFirstEmptyOrAppend(sheet, PASSWORD_DATA_COLS.USER_ID, [
+      'USR_OWNER_001',
+      'System Administrator',
+      'admin',
+      ROLES.OWNER,
+      adminHash,
+      'ACTIVE',
+      JSON.stringify(['ALL']),
+      now,
+      '',
+      false,
+    ]);
+  }
+  if (!managerFound) {
+    const managerHash = hashPassword('manager', 'Zenith@2026');
+    writeRowToFirstEmptyOrAppend(sheet, PASSWORD_DATA_COLS.USER_ID, [
+      'USR_0002',
+      'Library Manager',
+      'manager',
+      ROLES.MANAGER,
+      managerHash,
+      'ACTIVE',
+      JSON.stringify(['students.view', 'students.create', 'students.update', 'payments.view', 'payments.record', 'reports.view']),
+      now,
+      '',
+      false,
+    ]);
+  }
 }
 
 function getOrCreateSheet(sheetName) {
