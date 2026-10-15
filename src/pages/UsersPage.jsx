@@ -220,7 +220,7 @@ function CreateUserDialog({ isOpen, onClose, onCreated, token }) {
             {form.role === 'MANAGER' && (
               <div className="form-group">
                 <label className="form-label">Granular Manager Permissions</label>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2)', marginTop: 'var(--space-1)' }}>
+                <div className="form-grid-2" style={{ gap: 'var(--space-2)', marginTop: 'var(--space-1)' }}>
                   {PERMISSIONS_ALL.map((perm) => (
                     <label key={perm} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', cursor: 'pointer', fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>
                       <input

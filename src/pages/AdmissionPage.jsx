@@ -221,7 +221,7 @@ export default function AdmissionPage({ onNavigate }) {
             </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-4)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-5)' }}>
+          <div className="form-grid-responsive" style={{ fontSize: 'var(--text-sm)', marginBottom: 'var(--space-5)' }}>
             <div>
               <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: 'var(--text-xs)' }}>Student Name</span>
               <strong style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-primary)' }}>{successResult.studentName}</strong>
@@ -319,7 +319,7 @@ export default function AdmissionPage({ onNavigate }) {
               1. Student Personal Information
             </h2>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
+            <div className="form-grid-responsive">
               {/* Student Name */}
               <div className="form-group">
                 <label className="form-label" htmlFor="studentName">
@@ -416,7 +416,7 @@ export default function AdmissionPage({ onNavigate }) {
               2. Slot Plan & Fee Structure
             </h2>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-4)' }}>
+            <div className="form-grid-responsive">
               {/* Slot Plan */}
               <div className="form-group">
                 <label className="form-label" htmlFor="slotPlan">
@@ -472,7 +472,7 @@ export default function AdmissionPage({ onNavigate }) {
             </div>
 
             {/* One-time fees */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-4)', marginTop: 'var(--space-4)' }}>
+            <div className="form-grid-responsive" style={{ marginTop: 'var(--space-4)' }}>
               {/* Registration Fee */}
               <div className="form-group">
                 <label className="form-label" htmlFor="registrationFee">

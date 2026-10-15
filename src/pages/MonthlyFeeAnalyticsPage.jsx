@@ -308,12 +308,7 @@ export default function MonthlyFeeAnalyticsPage({ onNavigate = () => {} }) {
       </div>
 
       {/* ── Selected Month Focus Metrics ──────────────────────────────────── */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-        gap: 'var(--space-3)',
-        marginBottom: 'var(--space-5)',
-      }}>
+      <div className="dashboard-stats-grid">
         <div className="stat-card" style={{ borderLeft: '3px solid #10b981' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>

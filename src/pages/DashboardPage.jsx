@@ -259,26 +259,26 @@ export default function DashboardPage({ onNavigate = () => {} }) {
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+          <div className="page-header-actions">
             <button className="btn btn-ghost btn-sm" onClick={fetchDashboardData} aria-label="Refresh dashboard data">
               <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
               Refresh
             </button>
             <button className="btn btn-secondary btn-sm" onClick={() => onNavigate('analytics')}>
               <TrendingUp size={14} />
-              Monthly Fee Analytics
+              Analytics
             </button>
             <button className="btn btn-primary btn-sm" onClick={() => onNavigate('reports')}>
               <BarChart3 size={14} />
-              Reports & Exports
+              Reports
             </button>
           </div>
         </div>
 
         {/* ── Filter Toolbar ────────────────────────────────────────────── */}
-        <div className="card" style={{ padding: 'var(--space-3) var(--space-4)', marginBottom: 'var(--space-5)', background: 'var(--color-bg-surface-elevated)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+        <div className="card dashboard-filter-card">
+          <div className="filter-row-container">
+            <div className="filter-group-primary">
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Filter size={15} style={{ color: 'var(--color-primary-light)' }} />
                 <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--color-text-secondary)' }}>Filters:</span>
@@ -290,7 +290,7 @@ export default function DashboardPage({ onNavigate = () => {} }) {
                 <select
                   id="owner-year-select"
                   className="form-input"
-                  style={{ padding: '4px 10px', fontSize: 'var(--text-xs)', height: 32, minWidth: 90 }}
+                  style={{ padding: '4px 8px', fontSize: 'var(--text-xs)', height: 32, minWidth: 80 }}
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(parseInt(e.target.value))}
                 >
@@ -306,7 +306,7 @@ export default function DashboardPage({ onNavigate = () => {} }) {
                 <select
                   id="owner-month-select"
                   className="form-input"
-                  style={{ padding: '4px 10px', fontSize: 'var(--text-xs)', height: 32, minWidth: 120 }}
+                  style={{ padding: '4px 8px', fontSize: 'var(--text-xs)', height: 32, minWidth: 100 }}
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
                 >
@@ -322,7 +322,7 @@ export default function DashboardPage({ onNavigate = () => {} }) {
                 <select
                   id="owner-status-select"
                   className="form-input"
-                  style={{ padding: '4px 10px', fontSize: 'var(--text-xs)', height: 32 }}
+                  style={{ padding: '4px 8px', fontSize: 'var(--text-xs)', height: 32 }}
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                 >
@@ -334,14 +334,14 @@ export default function DashboardPage({ onNavigate = () => {} }) {
             </div>
 
             {/* Custom Date Range Filter */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div className="filter-date-group">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', width: '100%' }}>
                 <Calendar size={13} style={{ color: 'var(--color-text-muted)' }} />
-                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>Date Range:</span>
+                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>Range:</span>
                 <input
                   type="date"
                   className="form-input"
-                  style={{ padding: '4px 8px', fontSize: 'var(--text-xs)', height: 32 }}
+                  style={{ padding: '4px 6px', fontSize: 'var(--text-xs)', height: 32, flex: 1, minWidth: 110 }}
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
                   placeholder="From"
@@ -350,27 +350,27 @@ export default function DashboardPage({ onNavigate = () => {} }) {
                 <input
                   type="date"
                   className="form-input"
-                  style={{ padding: '4px 8px', fontSize: 'var(--text-xs)', height: 32 }}
+                  style={{ padding: '4px 6px', fontSize: 'var(--text-xs)', height: 32, flex: 1, minWidth: 110 }}
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
                   placeholder="To"
                 />
+                {(dateFrom || dateTo) && (
+                  <button
+                    className="btn btn-ghost btn-xs"
+                    onClick={() => { setDateFrom(''); setDateTo(''); }}
+                    style={{ fontSize: '0.7rem', padding: '2px 8px' }}
+                  >
+                    Clear
+                  </button>
+                )}
               </div>
-              {(dateFrom || dateTo) && (
-                <button
-                  className="btn btn-ghost btn-xs"
-                  onClick={() => { setDateFrom(''); setDateTo(''); }}
-                  style={{ fontSize: '0.7rem' }}
-                >
-                  Clear
-                </button>
-              )}
             </div>
           </div>
         </div>
 
         {/* ── Financial Distinction Notice Banner ──────────────────────── */}
-        <div style={{
+        <div className="accounting-rule-banner" style={{
           background: 'linear-gradient(135deg, rgba(124, 111, 205, 0.12), rgba(56, 189, 248, 0.08))',
           border: '1px solid rgba(124, 111, 205, 0.25)',
           borderRadius: 'var(--radius-xl)',
@@ -392,19 +392,14 @@ export default function DashboardPage({ onNavigate = () => {} }) {
               Core Financial Accounting Rule:
             </span>{' '}
             <span style={{ color: 'var(--color-text-secondary)' }}>
-              <strong>Cash Collection</strong> (actual receipts received on transaction dates) is accounted strictly separately from{' '}
-              <strong>Monthly Fee Coverage</strong> (fee allocations mapped to each ledger month). Advance payments cover future months without inflating future cash collection records.
+              <strong>Cash Collection</strong> is accounted separately from{' '}
+              <strong>Monthly Fee Coverage</strong>. Advance payments cover future months without inflating future cash collection records.
             </span>
           </div>
         </div>
 
         {/* ── The 11 Core Summary Cards ─────────────────────────────────── */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: 'var(--space-3)',
-          marginBottom: 'var(--space-6)',
-        }}>
+        <div className="dashboard-stats-grid">
           {/* 1. Total Active Students */}
           <StatCard
             icon={Users}
@@ -538,12 +533,7 @@ export default function DashboardPage({ onNavigate = () => {} }) {
         </div>
 
         {/* ── Visual Analytics Section: Trends & Distribution ─────────── */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))',
-          gap: 'var(--space-4)',
-          marginBottom: 'var(--space-6)',
-        }}>
+        <div className="dashboard-charts-grid">
           {/* Chart 1: Cash Collection vs Fee Coverage vs Admissions */}
           <div className="card" style={{ padding: 'var(--space-4)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-3)' }}>
@@ -666,11 +656,7 @@ export default function DashboardPage({ onNavigate = () => {} }) {
           <h2 style={{ fontSize: 'var(--text-xs)', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-primary-light)', fontWeight: 700, marginBottom: 'var(--space-3)' }}>
             Administrative Workflows
           </h2>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: 'var(--space-3)',
-          }}>
+          <div className="dashboard-stats-grid">
             <ActionCard
               title="Add New Admission"
               subtitle="Register new student & generate ID"
@@ -820,11 +806,7 @@ export default function DashboardPage({ onNavigate = () => {} }) {
         <h2 style={{ fontSize: 'var(--text-xs)', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-primary-light)', fontWeight: 700, marginBottom: 'var(--space-3)' }}>
           Manager Operations
         </h2>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: 'var(--space-3)',
-        }}>
+        <div className="dashboard-stats-grid">
           <ActionCard
             title="1. Add New Admission"
             subtitle="Admit student, assign slot & generate registration ID"
@@ -864,12 +846,7 @@ export default function DashboardPage({ onNavigate = () => {} }) {
       </div>
 
       {/* Manager Summary Cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: 'var(--space-3)',
-        marginBottom: 'var(--space-6)',
-      }}>
+      <div className="dashboard-stats-grid">
         <StatCard
           icon={Users}
           label="Active Students"

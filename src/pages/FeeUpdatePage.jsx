@@ -221,7 +221,7 @@ export default function FeeUpdatePage({ onNavigate = () => {}, initialParams = {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: selectedStudent ? '1.2fr 1fr' : '1fr', gap: 'var(--space-5)' }}>
+      <div className={selectedStudent ? "fee-update-layout" : ""}>
         {/* ── Left Column: Form ──────────────────────────────────────── */}
         <div>
           {/* Step 1: Student Selection */}
@@ -334,7 +334,7 @@ export default function FeeUpdatePage({ onNavigate = () => {}, initialParams = {
                 </h2>
 
                 {/* Starting Month & Year Selector (2026 - 2050) */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                <div className="form-grid-2">
                   <div className="form-group">
                     <label className="form-label">Starting Month</label>
                     <select
@@ -399,7 +399,7 @@ export default function FeeUpdatePage({ onNavigate = () => {}, initialParams = {
                 </div>
 
                 {/* Amount Received & Date */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                <div className="form-grid-2">
                   <div className="form-group">
                     <label className="form-label">
                       Amount Received (₹) <span style={{ color: 'var(--color-danger)' }}>*</span>
@@ -430,7 +430,7 @@ export default function FeeUpdatePage({ onNavigate = () => {}, initialParams = {
                 </div>
 
                 {/* Method & Txn Reference */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                <div className="form-grid-2">
                   <div className="form-group">
                     <label className="form-label">Payment Method</label>
                     <select
@@ -594,7 +594,7 @@ export default function FeeUpdatePage({ onNavigate = () => {}, initialParams = {
               </div>
 
               {/* Details */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-4)' }}>
+              <div className="form-grid-2" style={{ fontSize: 'var(--text-sm)', marginBottom: 'var(--space-4)' }}>
                 <div>
                   <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>Student Name:</span>
                   <div style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>{receiptData.studentName}</div>

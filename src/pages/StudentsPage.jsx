@@ -495,7 +495,7 @@ export default function StudentsPage({ onNavigate = () => {}, initialParams = {}
                 <div style={{ padding: 'var(--space-5)' }}>
                   {/* TAB 1: Profile Details */}
                   {activeTab === 'profile' && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-4)' }}>
+                    <div className="form-grid-responsive">
                       <div>
                         <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>Father's Name</span>
                         <div style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{profileData.student.fatherName || '—'}</div>
@@ -740,7 +740,7 @@ export default function StudentsPage({ onNavigate = () => {}, initialParams = {}
             </div>
 
             <form onSubmit={handleEditSave}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+              <div className="form-grid-2">
                 <div className="form-group">
                   <label className="form-label">Student Name</label>
                   <input

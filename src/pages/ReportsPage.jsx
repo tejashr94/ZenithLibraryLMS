@@ -47,7 +47,7 @@ function ReceiptModal({ receipt, onClose }) {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, fontSize: '0.82rem', marginBottom: 16 }}>
+        <div className="form-grid-2" style={{ gap: 12, fontSize: '0.82rem', marginBottom: 16 }}>
           <div>
             <div style={{ color: '#64748b', fontSize: '0.72rem' }}>Student Name:</div>
             <div style={{ fontWeight: 700, color: '#1e293b' }}>{receipt.studentName}</div>
