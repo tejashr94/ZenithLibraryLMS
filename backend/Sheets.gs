@@ -185,16 +185,47 @@ function generateId(prefix, sheet, idColumn) {
   lock.waitLock(10000);
   try {
     const data = sheet.getDataRange().getValues();
-    let maxNum = 0;
+    const existingNums = new Set();
     for (let i = 1; i < data.length; i++) {
-      const id = String(data[i][idColumn] || '');
+      const id = String(data[i][idColumn] || '').trim();
       const match = id.match(/\d+$/);
-      if (match) maxNum = Math.max(maxNum, parseInt(match[0]));
+      if (match) existingNums.add(parseInt(match[0], 10));
     }
-    return prefix + String(maxNum + 1).padStart(4, '0');
+    let nextNum = 1;
+    while (existingNums.has(nextNum)) {
+      nextNum++;
+    }
+    return prefix + String(nextNum).padStart(4, '0');
   } finally {
     lock.releaseLock();
   }
+}
+
+/**
+ * Writes a row into the first empty row available (filling gaps or starting from Row 2 if table is empty),
+ * or appends at the bottom if no empty row exists.
+ */
+function writeRowToFirstEmptyOrAppend(sheet, idColIndex, rowValues) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) {
+    sheet.getRange(2, 1, 1, rowValues.length).setValues([rowValues]);
+    return 2;
+  }
+
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    const isRowEmpty = data[i].every(cell => cell === '' || cell === null || cell === undefined);
+    const isIdEmpty = !data[i][idColIndex] || String(data[i][idColIndex]).trim() === '';
+    if (isRowEmpty || isIdEmpty) {
+      const rowNum = i + 1;
+      sheet.getRange(rowNum, 1, 1, rowValues.length).setValues([rowValues]);
+      return rowNum;
+    }
+  }
+
+  const nextRowNum = lastRow + 1;
+  sheet.getRange(nextRowNum, 1, 1, rowValues.length).setValues([rowValues]);
+  return nextRowNum;
 }
 
 function generateUserId() {
@@ -234,7 +265,7 @@ function writeAuditLog(userId, action, entityType, entityId, result, details) {
       ? JSON.stringify(sanitizeForAudit(details))
       : '';
 
-    sheet.appendRow([
+    const rowValues = [
       logId,
       now,
       userId || 'SYSTEM',
@@ -243,7 +274,8 @@ function writeAuditLog(userId, action, entityType, entityId, result, details) {
       entityId || '',
       result,
       safeDetails,
-    ]);
+    ];
+    writeRowToFirstEmptyOrAppend(sheet, AUDIT_LOG_COLS.LOG_ID, rowValues);
   } catch (err) {
     // Audit log failure should not break the main operation
     console.error('Failed to write audit log:', err.message);
@@ -345,7 +377,7 @@ function getAllUsers() {
 function createUserRecord(userData) {
   const sheet = getSheet(SHEET_NAMES.PASSWORDS);
   const now = new Date().toISOString();
-  sheet.appendRow([
+  const rowValues = [
     userData.id,
     userData.name,
     userData.username,
@@ -356,7 +388,8 @@ function createUserRecord(userData) {
     now,
     '',      // lastLogin
     false,   // tempPasswordFlag
-  ]);
+  ];
+  writeRowToFirstEmptyOrAppend(sheet, PASSWORD_DATA_COLS.USER_ID, rowValues);
 }
 
 function updateUserRecord(userId, updates) {
@@ -423,7 +456,7 @@ function createStudentRecord(studentData) {
   const now = new Date().toISOString();
   const regNum = generateRegistrationNumber();
 
-  sheet.appendRow([
+  const rowValues = [
     regNum,
     studentData.studentName,
     studentData.fatherName || '',
@@ -440,8 +473,9 @@ function createStudentRecord(studentData) {
     studentData.notes || '',
     now,
     now,
-  ]);
+  ];
 
+  writeRowToFirstEmptyOrAppend(sheet, STUDENT_COLS.REG_NUMBER, rowValues);
   return regNum;
 }
 
@@ -464,7 +498,7 @@ function createPaymentRecord(paymentData) {
   const paymentId = generatePaymentId();
   const receiptNumber = generateReceiptNumber();
 
-  sheet.appendRow([
+  const rowValues = [
     paymentId,
     paymentData.registrationNumber,
     paymentData.paymentDate || now.slice(0, 10),
@@ -475,8 +509,9 @@ function createPaymentRecord(paymentData) {
     paymentData.notes || '',
     paymentData.enteredBy || 'SYSTEM',
     now,
-  ]);
+  ];
 
+  writeRowToFirstEmptyOrAppend(sheet, FEE_UPDATE_COLS.PAYMENT_ID, rowValues);
   return { paymentId, receiptNumber };
 }
 
@@ -619,7 +654,7 @@ function upsertLedgerRecord(record) {
   }
 
   const newId = generateLedgerId();
-  sheet.appendRow([
+  const newRowValues = [
     newId,
     record.registrationNumber,
     recYear,
@@ -632,6 +667,7 @@ function upsertLedgerRecord(record) {
     record.status,
     record.notes || '',
     now,
-  ]);
+  ];
+  writeRowToFirstEmptyOrAppend(sheet, FEE_LEDGER_COLS.LEDGER_ID, newRowValues);
   return newId;
 }
